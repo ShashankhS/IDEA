@@ -1,4 +1,7 @@
 
+import sys
+
+
 def modAdd(a, b):
     return (a+b) % (2**16)
 
@@ -37,7 +40,6 @@ def keyGeneration(k):
 
 def round(p, k1, k2, k3, k4, k5, k6):
     p1, p2, p3, p4 = plainSplit(p)
-    print(hex(p1), hex(p2), hex(p3), hex(p4))
     s1 = modMultiply(p1, k1)
     s2 = modAdd(p2, k2)
     s3 = modAdd(p3, k3)
@@ -49,11 +51,31 @@ def round(p, k1, k2, k3, k4, k5, k6):
     s9 = modMultiply(s8, k6)
     s10 = modAdd(s7, s9)
     r1 = s1 ^ s9
-    r3 = s3 ^ s9
-    r2 = s2 ^ s10
+    r2 = s3 ^ s9
+    r3 = s2 ^ s10
     r4 = s4 ^ s10
-    print(hex(r1), hex(r2), hex(r3), hex(r4))
+    r = (r1 << 48) + (r2 << 32) + (r3 << 16) + r4
+    return r
 
 
-#round(0x05320a6414c819fa, 0x0064, 0x00c8, 0x012c, 0x0190, 0x01f4, 0x0258)
-keyGeneration(0x006400c8012c019001f4025802bc0320)
+def finalRound(p, k1, k2, k3, k4):
+    p1, p3, p2, p4 = plainSplit(p)
+    r1 = modMultiply(p1, k1)
+    r2 = modAdd(p2, k2)
+    r3 = modAdd(p3, k3)
+    r4 = modMultiply(p4, k4)
+    r = (r1 << 48) + (r2 << 32) + (r3 << 16) + r4
+    return r
+
+
+def encrypt(p, k):
+    sk = keyGeneration(k)
+    for i in range(0, 8):
+        p = round(p, sk[i*6], sk[i*6+1], sk[i*6+2],
+                  sk[i*6+3], sk[i*6+4], sk[i*6+5])
+    p = finalRound(p, sk[48], sk[49], sk[50], sk[51])
+    return p
+
+
+cipher = encrypt(ord(sys.argv[1]), ord(sys.argv[2]))
+print(hex(cipher))
