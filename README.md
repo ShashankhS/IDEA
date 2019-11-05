@@ -1,2 +1,1 @@
-This git will contain an implementation of IDEA (Internation Data Encryption Algorithm).<br>
-The implementation is in python.
+A python implementation of encryption of a 64 bit hexadecimal using IDEA (Internation Data Encryption Algorithm)
