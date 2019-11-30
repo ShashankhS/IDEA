@@ -77,5 +77,5 @@ def encrypt(p, k):
     return p
 
 
-cipher = encrypt(ord(sys.argv[1]), ord(sys.argv[2]))
+cipher = encrypt(int(sys.argv[1], 16), int(sys.argv[2], 16))
 print(hex(cipher))
